@@ -1,0 +1,14 @@
+,f1,accuracy,classificador
+tempo_implementacao,0.6683544303797468,0.6683544303797468,Extreme Gradient Boosting
+qtd_alteracoes_codigo,0.610126582278481,0.610126582278481,Gradient Boosting
+num_eventos_del,0.6050632911392405,0.6050632911392405,Extreme Gradient Boosting
+num_eventos,0.6025316455696202,0.6025316455696202,Gradient Boosting
+taxa_acerto,0.5620253164556962,0.5620253164556962,Random Forest
+num_consultas,0.5417721518987342,0.5417721518987342,Gradient Boosting
+num_testes,0.5367088607594936,0.5367088607594936,Extreme Gradient Boosting
+num_erros_lgcs,0.5088607594936709,0.5088607594936709,Extreme Gradient Boosting
+num_std_sem_submissao,0.4936708860759494,0.4936708860759494,Random Forest
+num_submissoes,0.47341772151898737,0.47341772151898737,Random Forest
+num_erros,0.47341772151898737,0.47341772151898737,Extreme Gradient Boosting
+num_errors_stx,0.4708860759493671,0.4708860759493671,Random Forest
+taxa_aceitacao,0.43037974683544306,0.43037974683544306,Random Forest

@@ -1,0 +1,5 @@
+__pycache__/
+csv/
+output/
+/**/.ipynb_checkpoints/
+tmp.txt
