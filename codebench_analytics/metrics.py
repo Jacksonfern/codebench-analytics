@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from enum import Enum
 from typing import List
 
-class Collector:
+class Collector(ABC):
     @abstractmethod
-    def collect(csv_source: str):
+    def collect(self, csv_source: str):
         pass
 
 class Metric:
@@ -17,17 +17,12 @@ class Metric:
         pass
 
 class QuestionMetrics:
-    """
-    Retrieves students executions and store metrics related to questions.
+    """Retrieves students executions and store metrics related to questions.
     
     Note
     ----
     When a question is solved by a student, all executions 
     after that will not be considered
-
-    Attributes
-    ----------
-    TODO
     """
 
     def __init__(self, num_students_interactions = 0, num_submissions = 0, num_tests = 0, num_correct = 0, 
@@ -55,6 +50,8 @@ class QuestionMetrics:
         )
 
 class StudentQuestionInfo:
+    """Contains statistics about student solving a question."""
+
     def __init__(self, is_correct = False, num_submissions = 0, num_tests = 0, 
                 num_errors = 0, num_logic_errors = 0, num_syntax_errors = 0, amount_of_change = 0):
         self.is_correct = is_correct
@@ -66,6 +63,8 @@ class StudentQuestionInfo:
         self.amount_of_change = amount_of_change
 
 class StudentCodeInfo:
+    """Statistics about a code submitted by a student."""
+
     def __init__(self, is_correct = False, submitted = False, code_time = 0, num_events = 0, num_deletes = 0, last_time = None) -> None:
         self.is_correct = is_correct
         self.submitted = submitted
@@ -75,6 +74,8 @@ class StudentCodeInfo:
         self.last_time = last_time
 
 class CodeMetrics:
+    """General statistics about a question."""
+
     def __init__(self, code_time = 0, num_events = 0, num_deletes = 0, num_blank = 0) -> None:
         self.code_time = code_time
         self.num_events = num_events

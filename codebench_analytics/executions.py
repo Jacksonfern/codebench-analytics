@@ -6,7 +6,7 @@ from cbTypes import QuestionStatus, QuestionExecution
 from components import Components
 from metrics import Metric, QuestionMetrics
 from enum import Enum
-from filters import Filters
+from codebench_analytics.assessments_filter import AssessmentFilter
 import re
 from utils import save
 
@@ -51,7 +51,7 @@ class ExecutionMetrics(Metric):
     def __collect(self, dataset_src: str, kinds: list = None) -> dict:
         print('Collecting {} from {}'.format(self.resource.value, dataset_src))
         execs = Components.getUsersData(dataset_src, self.resource)
-        assessments_filtered = Filters.get(dataset_src, kinds)
+        assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         question_statistics = {}
 
         for values in execs.values():

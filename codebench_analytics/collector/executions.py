@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple
 import csv
-from metrics import Collector, QuestionMetrics, StudentQuestionInfo
+from codebench_analytics.metrics import Collector, QuestionMetrics, StudentQuestionInfo
 
-from utils import save
+from codebench_analytics.utils import save
 
 class ExecutionCollector(Collector):
     """

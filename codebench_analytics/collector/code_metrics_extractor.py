@@ -6,10 +6,8 @@ import keyword
 import token
 import tokenize
 from typing import Dict, List
-from code_metrics import SolutionMetrics
-import token_mapping as tkm
-
-import pandas as pd
+from codebench_analytics.code_metrics import SolutionMetrics
+import codebench_analytics.token_mapping as tkm
 
 from collections import Counter, defaultdict
 

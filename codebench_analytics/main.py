@@ -3,7 +3,7 @@ from code_metrics import SolutionMetrics
 from collector.actions import ActionCollector
 from collector.code_metrics_extractor import Solution
 from collector.executions import ExecutionCollector
-from filters import Filters
+from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
 from parser.actions import ActionsParser
 from parser.executions import ExecutionParser
 from utils import save
@@ -15,19 +15,15 @@ from utils import save
 
 def generate_assessments():
     srcs = (
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2018-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2018-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2019-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2019-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2021-1',
+        '/home/jackson/Downloads/2023-1',
     )
-    kinds = ['exam']
+    # retrieve only exams (ignore homeworks). If you want to compute homework
+    # too, just add `homework` in the list
+    kinds = [AssessmentType.EXAM]
     assessments = set()
 
     for src in srcs:
-        data = Filters.get(src, kinds)
+        data = AssessmentFilter.get(src, kinds)
         for id in data:
             assessments.add(id)
 
@@ -35,15 +31,9 @@ def generate_assessments():
 
 def main():
     srcs = (
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2018-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2018-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2019-1',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2019-2',
-        '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2021-1',
+        '/home/jackson/Downloads/2023-1',
     )
-    kinds = ['exam']
+    kinds = [AssessmentType.EXAM]
 
     data = ExecutionParser(
         *srcs,
@@ -61,7 +51,7 @@ def main():
     ActionCollector.collect(src)
 
 def generate_code_metrics():
-    src = '/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/codigos_solucao.csv'
+    src = '/home/jackson/Downloads/codigo_solucao.csv'
     res = Solution.extract_from_professor(src)
     # for key, value in res.items():
     #     print(key, value)
@@ -72,6 +62,6 @@ def generate_code_metrics():
     save('output/data', 'code_metrics_professor.csv', res, ['question_id', *csv_fields])
 
 if __name__ == '__main__':
-    # main()
-    generate_assessments()
+    main()
+    # generate_assessments()
     # generate_code_metrics()

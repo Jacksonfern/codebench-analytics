@@ -3,13 +3,13 @@ from datetime import datetime
 from enum import Enum
 import json
 
-from importlib_metadata import re
-from components import Components
-from filters import Filters
-from metrics import ActionInfo, Metric
+import re
+from codebench_analytics.components import Components
+from codebench_analytics.assessments_filter import AssessmentFilter
+from codebench_analytics.metrics import Metric
 from os import path
 
-from utils import save
+from codebench_analytics.utils import save
 
 class ActionsParser(Metric):
 
@@ -38,7 +38,7 @@ class ActionsParser(Metric):
 
     def __collect(self, dataset_src: str, kinds: list = None) -> list:
         user_events = Components.getUsersData(dataset_src, self.resource)
-        assessments_filtered = Filters.get(dataset_src, kinds)
+        assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
         rows = []
 

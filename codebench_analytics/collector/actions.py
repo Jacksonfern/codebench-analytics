@@ -1,8 +1,8 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
-from importlib_metadata import csv
-from metrics import CodeMetrics, Collector, StudentCodeInfo
-from utils import save
+import csv
+from codebench_analytics.metrics import CodeMetrics, Collector, StudentCodeInfo
+from codebench_analytics.utils import save
 from datetime import datetime
 
 
@@ -55,27 +55,29 @@ class ActionCollector(Collector):
 
         store_data: List[dict] = []
         csv_fields = ['student', 'question', *vars(StudentCodeInfo()).keys()]
-        for key, info in data.items():
-            if info.submitted and info.code_time <= ActionCollector.MAX_CODE_TIME:
+        for key, code_info in data.items():
+            if code_info.submitted and code_info.code_time <= ActionCollector.MAX_CODE_TIME:
                 student, question = key
-                store_data.append({ 'student': student, 'question': question, **vars(info) })
+                store_data.append({ 'student': student, 'question': question, **vars(code_info)})
         save('output/metrics', 'actions_by_student.csv', store_data, csv_fields)
 
         questions_info: Dict[int, CodeMetrics] = {}
+        metrics_info: Optional[CodeMetrics] = None
         for key, value in data.items():
             student, question_id = key
             if not value.submitted and value.code_time >= ActionCollector.MIN_IT_TIME:
-                info.num_blank += 1
+                assert metrics_info is not None
+                metrics_info.num_blank += 1
             if value.code_time > ActionCollector.MAX_CODE_TIME or not value.submitted:
                 continue
             if not question_id in questions_info:
                 questions_info[question_id] = CodeMetrics()
-            info = questions_info[question_id]
+            code_info = questions_info[question_id]
 
             if value.is_correct:
-                info.code_time += value.code_time
-            info.num_events += value.num_events
-            info.num_deletes += value.num_deletes
+                code_info.code_time += value.code_time
+            code_info.num_events += value.num_events
+            code_info.num_deletes += value.num_deletes
 
         csv_fields = list(vars(CodeMetrics()).keys())
         return save('output/metrics', 'actions_data.csv', questions_info, ['question', *csv_fields])

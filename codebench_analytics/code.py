@@ -4,7 +4,7 @@ from typing import Dict, List
 from metrics import CodeMetrics, Metric
 from enum import Enum
 from components import Components
-from filters import Filters
+from codebench_analytics.assessments_filter import AssessmentFilter
 from os import path
 import re
 
@@ -18,7 +18,7 @@ class Code(Metric):
     def __collect(self, dataset_src: str, kinds = List[str]) -> Dict[str, str]:
         print('Collecting {} from {}'.format(self.resource.value, dataset_src))
         execs = Components.getUsersData(dataset_src, self.resource)
-        assessments_filtered = Filters.get(dataset_src, kinds)
+        assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         code_statistics = {}
 
         for values in execs.values():

@@ -1,11 +1,11 @@
 from os import path
 from typing import List
-from cbTypes import QuestionExecution, Resource
-from components import Components
-from metrics import Metric
+from codebench_analytics.cbTypes import QuestionExecution, Resource
+from codebench_analytics.components import Components
+from codebench_analytics.metrics import Metric
 from enum import Enum
-from filters import Filters
-from utils import save,codeDiff
+from codebench_analytics.assessments_filter import AssessmentFilter
+from codebench_analytics.utils import save,codeDiff
 import re
 
 class ExecutionParser(Metric):
@@ -33,7 +33,7 @@ class ExecutionParser(Metric):
     def __collect(self, dataset_src: str, kinds: list = None) -> list:
         print('Collecting {} from {}'.format(self.resource.value, dataset_src))
         execs = Components.getUsersData(dataset_src, self.resource)
-        assessments_filtered = Filters.get(dataset_src, kinds)
+        assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
         log_rows = []
 
@@ -89,7 +89,7 @@ class ExecutionParser(Metric):
                             i += 1
                             grade = lines[i].strip()
 
-                            assert op == QuestionExecution.SUBMIT, 'Response for non submission'
+                            assert op == QuestionExecution.SUBMIT, f'Response for non submission {op} {fullpath}'
                             assert re.match(r"\d+\%", grade), 'Not a percent number'
 
                             row['run'] = 'successful'

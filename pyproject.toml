@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "codebench-analytics"
+version = "0.1.0"
+description = "Contains python codes and jupyter notebooks used for analyzing the correlation between complexity and difficulty of introductory programming problems"
+authors = ["Jackson <jackson.fernandes@icomp.ufam.edu.br>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+radon = "^6.0.1"
+black = "^24.8.0"
+numpy = "^2.1.1"
+pandas = "^2.2.3"
+
+[tool.poetry.scripts]
+codebench_analytics = 'codebench_analytics.main:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

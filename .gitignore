@@ -1,5 +1,6 @@
 __pycache__/
 csv/
+.idea
 output/
 /**/.ipynb_checkpoints/
 tmp.txt
