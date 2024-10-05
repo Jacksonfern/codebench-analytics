@@ -1,6 +1,6 @@
 from enum import Enum
 from os import path, listdir
-from cbTypes import Data, Resource
+from codebench_analytics.model.codebench_types import Data, Resource
 
 
 class Components:
@@ -9,7 +9,7 @@ class Components:
     """
 
     @staticmethod
-    def getData(dataset_src: str, resource_path: Enum) -> list:
+    def get_data(dataset_src: str, resource_path: Enum) -> list:
         classes = listdir(dataset_src)
         data = []
 
@@ -22,8 +22,8 @@ class Components:
         return data
 
     @staticmethod
-    def getUsersData(dataset_src: str, resource: Resource) -> dict:
-        users = Components.getData(dataset_src, Data.USER)
+    def get_users_data(dataset_src: str, resource: Resource) -> dict:
+        users = Components.get_data(dataset_src, Data.USER)
         students = {}
 
         for user_path in users:
@@ -49,7 +49,7 @@ class Components:
 
 # For testing purposes only
 if __name__ == "__main__":
-    d = Components.getUsersData(
+    d = Components.get_users_data(
         "/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-1",
         Resource.EXECUTIONS,
     )

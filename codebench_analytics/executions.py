@@ -1,14 +1,14 @@
 from os import path
 from typing import Dict
 
-from cbTypes import QuestionStatus, QuestionExecution
+from codebench_analytics.model.codebench_types import QuestionStatus, QuestionExecution
 
-from components import Components
-from metrics import Metric, QuestionMetrics
+from codebench_analytics.utils.components import Components
+from codebench_analytics.model.metrics import Metric, QuestionMetrics
 from enum import Enum
 from codebench_analytics.assessments_filter import AssessmentFilter
 import re
-from utils import save
+from codebench_analytics.utils.dataset import save
 
 
 class ExecutionMetrics(Metric):
@@ -50,7 +50,7 @@ class ExecutionMetrics(Metric):
 
     def __collect(self, dataset_src: str, kinds: list = None) -> dict:
         print("Collecting {} from {}".format(self.resource.value, dataset_src))
-        execs = Components.getUsersData(dataset_src, self.resource)
+        execs = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         question_statistics = {}
 

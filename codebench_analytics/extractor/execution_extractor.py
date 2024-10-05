@@ -1,26 +1,27 @@
 from os import path
-from typing import List
-from codebench_analytics.cbTypes import QuestionExecution, Resource
-from codebench_analytics.components import Components
-from codebench_analytics.metrics import Metric
-from enum import Enum
-from codebench_analytics.assessments_filter import AssessmentFilter
-from codebench_analytics.utils import save, codeDiff
+from typing import List, Optional
+
+from codebench_analytics.extractor import Extractor
+from codebench_analytics.model.codebench_types import QuestionExecution, Resource
+from codebench_analytics.utils.components import Components
+from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
+from codebench_analytics.utils.dataset import save
+from codebench_analytics.utils.code_diff import code_diff
 import re
 
 
-class ExecutionParser(Metric):
-    """
-    TODO:
-    """
+class ExecutionExtractor(Extractor):
+    """Extract data about student executions."""
 
-    def __init__(self, *dataset_src, resource: Enum):
+    TERMINATOR = "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+
+    def __init__(self, *dataset_src, resource: Resource):
         super().__init__(*dataset_src, resource=resource)
 
-    def collect(self, kinds: list = None) -> str:
+    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         data: List[dict] = []
         for src in self.dataset_src:
-            partial_data = self.__collect(src, kinds)
+            partial_data = self._collect(src, kinds)
             data.extend(partial_data)
 
         assert len(data) > 0, "empty dataset"
@@ -39,9 +40,9 @@ class ExecutionParser(Metric):
         ]
         return save("output/data", "executions_data.csv", data, csv_fields)
 
-    def __collect(self, dataset_src: str, kinds: list = None) -> list:
+    def _collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]]) -> list:
         print("Collecting {} from {}".format(self.resource.value, dataset_src))
-        execs = Components.getUsersData(dataset_src, self.resource)
+        execs = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
         log_rows = []
@@ -107,7 +108,7 @@ class ExecutionParser(Metric):
 
                             assert (
                                 op == QuestionExecution.SUBMIT
-                            ), f"Response for non submission {op} {fullpath}"
+                            ), f"Response for non submission in {fullpath} {lines[i]}"
                             assert re.match(r"\d+\%", grade), "Not a percent number"
 
                             row["run"] = "successful"
@@ -115,7 +116,7 @@ class ExecutionParser(Metric):
                         elif l.startswith("-- CODE:"):
                             while i + 1 < len(lines):
                                 l = lines[i + 1].strip()
-                                if l.startswith("--"):
+                                if l.startswith("--") or l == self.TERMINATOR:
                                     break
                                 cur_code.append(l)
                                 i += 1
@@ -126,14 +127,23 @@ class ExecutionParser(Metric):
                             )
 
                             if len(prev_code) > 0:
-                                row["amount_of_change"] = codeDiff(prev_code, cur_code)
+                                row["amount_of_change"] = code_diff(prev_code, cur_code)
                             prev_code = cur_code
                             cur_code = []
                         elif l.startswith("-- OUTPUT:"):
                             row["run"] = "successful"
 
-                        if l == "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*":
+                        if l == self.TERMINATOR:
                             log_rows.append({**base_row, **row})
                             row = {}
                         i += 1
         return log_rows
+
+    def _log_from_rows(self):
+        pass
+
+    def _row_from(self):
+        pass
+
+if __name__ == '__main__':
+    ExecutionExtractor('/home/jackson/Downloads/2023-1', resource=Resource.EXECUTIONS).collect([AssessmentType.EXAM])

@@ -1,9 +1,8 @@
 from enum import StrEnum, auto
 from os import path
-from pathlib import Path
 
-from codebench_analytics.cbTypes import Data
-from codebench_analytics.components import Components
+from codebench_analytics.model.codebench_types import Data
+from codebench_analytics.utils.components import Components
 
 
 class AssessmentType(StrEnum):
@@ -14,14 +13,15 @@ class AssessmentType(StrEnum):
 class AssessmentFilter:
     """Filter assessments by set of kinds.
 
-    If no kind is set, it will get all
+    If no kind is set, it will get all. See the `AssessmentType` to see
+    all possible kinds.
     """
 
     @staticmethod
     def get(dataset_src, kinds: list[AssessmentType] = None):
         """Get all the assessments from given kinds, such as homeworks and exams."""
 
-        assessments = Components.getData(dataset_src, Data.ASSESSMENT)
+        assessments = Components.get_data(dataset_src, Data.ASSESSMENT)
         assessment_ids = []
 
         for assessment in assessments:

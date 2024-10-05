@@ -1,8 +1,9 @@
 from typing import Dict, List, Tuple, Optional
 
 import csv
-from codebench_analytics.metrics import CodeMetrics, Collector, StudentCodeInfo
-from codebench_analytics.utils import save
+from codebench_analytics.model.metrics import CodeMetrics, StudentCodeInfo
+from codebench_analytics.collector import Collector
+from codebench_analytics.utils.dataset import save
 from datetime import datetime
 
 
@@ -12,11 +13,10 @@ class ActionCollector(Collector):
     MIN_IT_TIME = 180.0
     MAX_CODE_TIME = 7200.0
 
-    @staticmethod
-    def collect(csv_source: str) -> str:
+    def collect(self) -> str:
         data: Dict[Tuple[int, int], StudentCodeInfo] = {}
 
-        with open(csv_source, "r", newline="") as csv_file:
+        with open(self.csv_source, "r", newline="") as csv_file:
             reader = csv.DictReader(csv_file)
 
             for row in reader:
@@ -57,14 +57,14 @@ class ActionCollector(Collector):
 
         store_data: List[dict] = []
         csv_fields = ["student", "question", *vars(StudentCodeInfo()).keys()]
-        for key, code_info in data.items():
+        for key, metrics_info in data.items():
             if (
-                code_info.submitted
-                and code_info.code_time <= ActionCollector.MAX_CODE_TIME
+                metrics_info.submitted
+                and metrics_info.code_time <= ActionCollector.MAX_CODE_TIME
             ):
                 student, question = key
                 store_data.append(
-                    {"student": student, "question": question, **vars(code_info)}
+                    {"student": student, "question": question, **vars(metrics_info)}
                 )
         save("output/metrics", "actions_by_student.csv", store_data, csv_fields)
 
@@ -79,12 +79,12 @@ class ActionCollector(Collector):
                 continue
             if not question_id in questions_info:
                 questions_info[question_id] = CodeMetrics()
-            code_info = questions_info[question_id]
+            metrics_info = questions_info[question_id]
 
             if value.is_correct:
-                code_info.code_time += value.code_time
-            code_info.num_events += value.num_events
-            code_info.num_deletes += value.num_deletes
+                metrics_info.code_time += value.code_time
+            metrics_info.num_events += value.num_events
+            metrics_info.num_deletes += value.num_deletes
 
         csv_fields = list(vars(CodeMetrics()).keys())
         return save(
@@ -93,3 +93,7 @@ class ActionCollector(Collector):
             questions_info,
             ["question", *csv_fields],
         )
+
+if __name__ == '__main__':
+    src = 'output/data/actions.csv'
+    ActionCollector(src).collect()

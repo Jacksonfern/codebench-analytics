@@ -1,21 +1,15 @@
 from abc import abstractmethod, ABC
 from enum import Enum
-from typing import List
+from typing import Optional
 
 
-class Collector(ABC):
-    @abstractmethod
-    def collect(self, csv_source: str):
-        pass
-
-
-class Metric:
+class Metric(ABC):
     def __init__(self, *dataset_src, resource: Enum):
         self.dataset_src = dataset_src
         self.resource = resource
 
     @abstractmethod
-    def collect(self, kinds=List[str]) -> str:
+    def collect(self, kinds: Optional[list[str]] = None) -> str:
         pass
 
 
@@ -95,7 +89,7 @@ class StudentCodeInfo:
         num_events=0,
         num_deletes=0,
         last_time=None,
-    ) -> None:
+    ):
         self.is_correct = is_correct
         self.submitted = submitted
         self.code_time = code_time
@@ -107,7 +101,7 @@ class StudentCodeInfo:
 class CodeMetrics:
     """General statistics about a question."""
 
-    def __init__(self, code_time=0, num_events=0, num_deletes=0, num_blank=0) -> None:
+    def __init__(self, code_time=0, num_events=0, num_deletes=0, num_blank=0):
         self.code_time = code_time
         self.num_events = num_events
         self.num_deletes = num_deletes
@@ -115,7 +109,7 @@ class CodeMetrics:
 
 
 class ActionInfo:
-    def __init__(self, date, event_type, event_key=None, event_op=None) -> None:
+    def __init__(self, date, event_type, event_key=None, event_op=None):
         self.date = date
         self.event_type = event_type
         self.event_key = event_key

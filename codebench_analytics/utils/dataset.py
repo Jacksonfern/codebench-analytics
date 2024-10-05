@@ -1,7 +1,7 @@
-from os import makedirs, path
 import csv
 import logging
-from typing import Any, Dict, List, Union
+from os import path, makedirs
+from typing import Dict, Any, List, Union
 
 
 def save_dict(csvfile, data: Dict[int, Any], fields):
@@ -37,24 +37,8 @@ def save(
         elif type(data) == list:
             save_list(csvfile, data, fields)
         else:
-            raise Exception("Invalid data type {}".format(type(data)))
+            raise ValueError("Invalid data type {}".format(type(data)))
 
     logging.info("Done!")
 
     return src
-
-
-def codeDiff(prev_code, cur_code) -> int:
-    diff = 0
-    n = len(prev_code)
-    m = len(cur_code)
-    for i in range(n):
-        prev_line = prev_code[i]
-        cur_line = cur_code[i] if i < m else ""
-        diff += sum(1 for a, b in zip(prev_line, cur_line) if a != b) + abs(
-            len(prev_line) - len(cur_line)
-        )
-
-    for i in range(n, m):
-        diff += len(cur_code[i])
-    return diff

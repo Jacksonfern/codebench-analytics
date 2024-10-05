@@ -1,12 +1,12 @@
-from cbTypes import Resource
-from code_metrics import SolutionMetrics
+from codebench_analytics.model.codebench_types import Resource
+from codebench_analytics.model.code_metrics import SolutionMetrics
 from collector.actions import ActionCollector
-from collector.code_metrics_extractor import Solution
+from codebench_analytics.extractor.code_metrics_extractor import Solution
 from collector.executions import ExecutionCollector
 from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
-from parser.actions import ActionsParser
-from parser.executions import ExecutionParser
-from utils import save
+from codebench_analytics.extractor.action_extractor import ActionsExtractor
+from extractor.execution_extractor import ExecutionExtractor
+from codebench_analytics.utils.dataset import save
 
 # TODO: make dataset extractor more interactive.
 # 1. Prompt to select options
@@ -33,14 +33,14 @@ def main():
     srcs = ("/home/jackson/Downloads/2023-1",)
     kinds = [AssessmentType.EXAM]
 
-    data = ExecutionParser(*srcs, resource=Resource.EXECUTIONS)
+    data = ExecutionExtractor(*srcs, resource=Resource.EXECUTIONS)
 
     src = data.collect(kinds=kinds)
-    ExecutionCollector.collect(src)
+    ExecutionCollector(src).collect()
 
-    parser = ActionsParser(*srcs, resource=Resource.CODEMIRRORS)
+    parser = ActionsExtractor(*srcs, resource=Resource.CODEMIRRORS)
     src = parser.collect(kinds=kinds)
-    ActionCollector.collect(src)
+    ActionCollector(src).collect()
 
 
 def generate_code_metrics():

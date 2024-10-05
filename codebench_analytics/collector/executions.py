@@ -1,8 +1,9 @@
 from typing import Dict, List, Tuple
 import csv
-from codebench_analytics.metrics import Collector, QuestionMetrics, StudentQuestionInfo
+from codebench_analytics.model.metrics import QuestionMetrics, StudentQuestionInfo
+from codebench_analytics.collector import Collector
 
-from codebench_analytics.utils import save
+from codebench_analytics.utils.dataset import save
 
 
 class ExecutionCollector(Collector):
@@ -16,10 +17,9 @@ class ExecutionCollector(Collector):
     TODO:
     """
 
-    @staticmethod
-    def collect(csv_source: str) -> None:
+    def collect(self):
         students_info: Dict[Tuple[int, int], StudentQuestionInfo] = {}
-        with open(csv_source, "r", newline="") as csv_file:
+        with open(self.csv_source, "r", newline="") as csv_file:
             reader = csv.DictReader(csv_file)
             try:
                 for row in reader:
@@ -91,11 +91,11 @@ class ExecutionCollector(Collector):
                 qs.num_errors >= qs.num_logic_errors
             ), "the number of logic errors is bigger than the number of all possible errors"
 
-        toErase = filter(
+        to_erase = filter(
             lambda id: questions_statistics[id].num_students_interactions == 0,
             questions_statistics,
         )
-        for id in list(toErase):
+        for id in to_erase:
             questions_statistics.pop(id)
 
         csv_fields = list(vars(QuestionMetrics()).keys())

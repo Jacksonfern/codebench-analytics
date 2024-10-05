@@ -1,24 +1,22 @@
 # ***********************USELESS FOR NOW*************************************
 
-from typing import Dict, List
-from metrics import CodeMetrics, Metric
+from typing import Dict, List, Optional
+
+from codebench_analytics.extractor import Extractor
+from codebench_analytics.model.metrics import CodeMetrics, Metric
 from enum import Enum
-from components import Components
-from codebench_analytics.assessments_filter import AssessmentFilter
+from codebench_analytics.utils.components import Components
+from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
 from os import path
-import re
 
 
-class Code(Metric):
-    def __init__(self, *dataset_src, resource: Enum):
-        super().__init__(*dataset_src, resource=resource)
-
-    def collect(self, kinds: List[str]) -> None:
+class Code(Extractor):
+    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         pass
 
-    def __collect(self, dataset_src: str, kinds=List[str]) -> Dict[str, str]:
+    def __collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]]) -> Dict[str, str]:
         print("Collecting {} from {}".format(self.resource.value, dataset_src))
-        execs = Components.getUsersData(dataset_src, self.resource)
+        execs = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         code_statistics = {}
 

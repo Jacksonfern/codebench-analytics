@@ -1,18 +1,19 @@
-from curses import meta
-from datetime import datetime
 from enum import Enum
 import json
 
 import re
-from codebench_analytics.components import Components
-from codebench_analytics.assessments_filter import AssessmentFilter
-from codebench_analytics.metrics import Metric
+from typing import Optional
+
+from codebench_analytics.extractor import Extractor
+from codebench_analytics.utils.components import Components
+from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
+from codebench_analytics.model.metrics import Metric
 from os import path
 
-from codebench_analytics.utils import save
+from codebench_analytics.utils.dataset import save
 
 
-class ActionsParser(Metric):
+class ActionsExtractor(Extractor):
 
     correctedInfo = "Congratulations, your code is correct!"
     not_json_metadata = [
@@ -25,10 +26,7 @@ class ActionsParser(Metric):
     ]
     date_regex = re.compile(r"\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}\.\d{3}")
 
-    def __init__(self, *dataset_src, resource: Enum):
-        super().__init__(*dataset_src, resource=resource)
-
-    def collect(self, kinds: list = None) -> str:
+    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         data = []
         for src in self.dataset_src:
             print("Collecting {} from {}".format(self.resource.value, src))
@@ -48,8 +46,8 @@ class ActionsParser(Metric):
         ]
         return save("output/data", "actions.csv", data, csv_fields)
 
-    def __collect(self, dataset_src: str, kinds: list = None) -> list:
-        user_events = Components.getUsersData(dataset_src, self.resource)
+    def __collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]] = None) -> list:
+        user_events = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
         rows = []
@@ -82,13 +80,13 @@ class ActionsParser(Metric):
                                 continue
 
                             event_time, event_type, metadata = values.groups()
-                            if not ActionsParser.date_regex.fullmatch(event_time):
+                            if not ActionsExtractor.date_regex.fullmatch(event_time):
                                 continue
 
                             row = {"event_time": event_time, "event_type": event_type}
 
                             if metadata and len(metadata) > 0:
-                                if event_type not in ActionsParser.not_json_metadata:
+                                if event_type not in ActionsExtractor.not_json_metadata:
                                     meta_json = json.loads(metadata)
                                     if type(meta_json) == dict:
                                         if "origin" in meta_json:
@@ -98,7 +96,7 @@ class ActionsParser(Metric):
                                 elif event_type == "submit":
                                     row["event_info"] = (
                                         "correct"
-                                        if metadata == ActionsParser.correctedInfo
+                                        if metadata == ActionsExtractor.correctedInfo
                                         else "incorrect"
                                     )
 
