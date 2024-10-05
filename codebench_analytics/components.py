@@ -2,6 +2,7 @@ from enum import Enum
 from os import path, listdir
 from cbTypes import Data, Resource
 
+
 class Components:
     """Returns elements sources from each class, which can be assessments
     or users (students).
@@ -26,11 +27,11 @@ class Components:
         students = {}
 
         for user_path in users:
-            d = user_path.split('/')
+            d = user_path.split("/")
             class_id, user_id = d[0], d[-1]
-            key = f'{class_id}-{user_id}'
+            key = f"{class_id}-{user_id}"
 
-            assert key not in students, 'Duplicated entry for user %d'%user_id
+            assert key not in students, "Duplicated entry for user %d" % user_id
 
             src = path.join(dataset_src, user_path, resource.value)
 
@@ -45,7 +46,11 @@ class Components:
 
         return students
 
+
 # For testing purposes only
-if __name__ == '__main__':
-    d = Components.getUsersData('/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-1', Resource.EXECUTIONS)
+if __name__ == "__main__":
+    d = Components.getUsersData(
+        "/home/jackson/Documentos/UFAM/8_Periodo/TCC/Dataset/collection/2017-1",
+        Resource.EXECUTIONS,
+    )
     print(d)

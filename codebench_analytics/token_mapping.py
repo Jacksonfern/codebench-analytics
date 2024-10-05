@@ -101,5 +101,7 @@ BUILTIN_FUNC = 103
 KWD_PRINT = 104
 KWD_INPUT = 105
 
-tk_names = {value: name.lower() for name, value in globals().items() if isinstance(value, int)}
+tk_names = {
+    value: name.lower() for name, value in globals().items() if isinstance(value, int)
+}
 tk_codes = {value: key for key, value in tk_names.items()}

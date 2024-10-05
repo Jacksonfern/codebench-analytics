@@ -267,7 +267,7 @@ class SolutionMetrics:
             self.identifiers_unique,
             self.identifiers_max_len,
             self.identifiers_min_len,
-            self.identifiers_mean_len
+            self.identifiers_mean_len,
         ]
 
     @staticmethod

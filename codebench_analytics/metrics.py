@@ -2,10 +2,12 @@ from abc import abstractmethod, ABC
 from enum import Enum
 from typing import List
 
+
 class Collector(ABC):
     @abstractmethod
     def collect(self, csv_source: str):
         pass
+
 
 class Metric:
     def __init__(self, *dataset_src, resource: Enum):
@@ -16,17 +18,27 @@ class Metric:
     def collect(self, kinds=List[str]) -> str:
         pass
 
+
 class QuestionMetrics:
     """Retrieves students executions and store metrics related to questions.
-    
+
     Note
     ----
-    When a question is solved by a student, all executions 
+    When a question is solved by a student, all executions
     after that will not be considered
     """
 
-    def __init__(self, num_students_interactions = 0, num_submissions = 0, num_tests = 0, num_correct = 0, 
-                num_errors = 0, num_logic_errors = 0, num_syntax_errors = 0, amount_of_change = 0):
+    def __init__(
+        self,
+        num_students_interactions=0,
+        num_submissions=0,
+        num_tests=0,
+        num_correct=0,
+        num_errors=0,
+        num_logic_errors=0,
+        num_syntax_errors=0,
+        amount_of_change=0,
+    ):
         self.num_students_interactions = num_students_interactions
         self.num_submissions = num_submissions
         self.num_tests = num_tests
@@ -46,14 +58,23 @@ class QuestionMetrics:
             self.num_errors + other.num_errors,
             self.num_logic_errors + other.num_logic_errors,
             self.num_syntax_errors + other.num_syntax_errors,
-            self.amount_of_change + other.amount_of_change
+            self.amount_of_change + other.amount_of_change,
         )
+
 
 class StudentQuestionInfo:
     """Contains statistics about student solving a question."""
 
-    def __init__(self, is_correct = False, num_submissions = 0, num_tests = 0, 
-                num_errors = 0, num_logic_errors = 0, num_syntax_errors = 0, amount_of_change = 0):
+    def __init__(
+        self,
+        is_correct=False,
+        num_submissions=0,
+        num_tests=0,
+        num_errors=0,
+        num_logic_errors=0,
+        num_syntax_errors=0,
+        amount_of_change=0,
+    ):
         self.is_correct = is_correct
         self.num_submissions = num_submissions
         self.num_tests = num_tests
@@ -62,10 +83,19 @@ class StudentQuestionInfo:
         self.num_syntax_errors = num_syntax_errors
         self.amount_of_change = amount_of_change
 
+
 class StudentCodeInfo:
     """Statistics about a code submitted by a student."""
 
-    def __init__(self, is_correct = False, submitted = False, code_time = 0, num_events = 0, num_deletes = 0, last_time = None) -> None:
+    def __init__(
+        self,
+        is_correct=False,
+        submitted=False,
+        code_time=0,
+        num_events=0,
+        num_deletes=0,
+        last_time=None,
+    ) -> None:
         self.is_correct = is_correct
         self.submitted = submitted
         self.code_time = code_time
@@ -73,17 +103,19 @@ class StudentCodeInfo:
         self.num_deletes = num_deletes
         self.last_time = last_time
 
+
 class CodeMetrics:
     """General statistics about a question."""
 
-    def __init__(self, code_time = 0, num_events = 0, num_deletes = 0, num_blank = 0) -> None:
+    def __init__(self, code_time=0, num_events=0, num_deletes=0, num_blank=0) -> None:
         self.code_time = code_time
         self.num_events = num_events
         self.num_deletes = num_deletes
         self.num_blank = num_blank
 
+
 class ActionInfo:
-    def __init__(self, date, event_type, event_key = None, event_op = None) -> None:
+    def __init__(self, date, event_type, event_key=None, event_op=None) -> None:
         self.date = date
         self.event_type = event_type
         self.event_key = event_key
