@@ -17,11 +17,11 @@ Alternativamente você pode rodar `make setup`, que basicamente faz a mesma cois
 
 ## Execução
 
-Este projeto possui três tipos de operações: `execution`, `actions` e `solution`.
+Este projeto possui três tipos de operações: `execution`, `action` e `solution`.
 
 * `execution`: extrai métricas relacionadas à execução de código na IDE do Codebench, tais como testes e submissões
-* `actions`: extrai métricas relacionadas à interação dos alunos na IDE do Codebench, tais como teclas digitadas, botões clicados, etc.
-* `solutions`: extrai métricas de código das soluções pré-cadastradas no Codebench pelos professores ou monitores.
+* `action`: extrai métricas relacionadas à interação dos alunos na IDE do Codebench, tais como teclas digitadas, botões clicados, etc.
+* `solution`: extrai métricas de código das soluções pré-cadastradas no Codebench pelos professores ou monitores.
 
 ### Extraindo métricas de execução ou ação
 
