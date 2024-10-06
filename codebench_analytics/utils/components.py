@@ -1,5 +1,6 @@
 from enum import Enum
-from os import path, listdir
+from os import listdir, path
+
 from codebench_analytics.model.codebench_types import Data, Resource
 
 

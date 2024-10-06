@@ -1,24 +1,21 @@
 import json
-
+import logging
 import re
+from os import path
 from typing import Optional
 
 from codebench_analytics.extractor import Extractor
-from codebench_analytics.utils.components import Components
 from codebench_analytics.utils.assessments_filter import (
     AssessmentFilter,
     AssessmentType,
 )
-from os import path
-import logging
-
+from codebench_analytics.utils.components import Components
 from codebench_analytics.utils.dataset import save
 
 logger = logging.getLogger(__name__)
 
 
 class ActionsExtractor(Extractor):
-
     CORRECTED_INFO = "Congratulations, your code is correct!"
     NOT_JSON_METADATA = [
         "submit",
@@ -65,7 +62,7 @@ class ActionsExtractor(Extractor):
                 assessment_id, question_id = name.split("_")
                 assessment_id, question_id = int(assessment_id), int(question_id)
 
-                if not assessment_id in assessments_filtered:
+                if assessment_id not in assessments_filtered:
                     continue
 
                 base_row = {
@@ -79,9 +76,9 @@ class ActionsExtractor(Extractor):
                 fullpath = path.join(dataset_src, mirror)
                 with open(fullpath, "r") as log:
                     for line in log:
-                        l = line.strip()
+                        ln = line.strip()
                         try:
-                            values = re.fullmatch(r"([^#]*)#([^#]*)#(.*)", l)
+                            values = re.fullmatch(r"([^#]*)#([^#]*)#(.*)", ln)
                             if not values:
                                 continue
 
@@ -89,12 +86,18 @@ class ActionsExtractor(Extractor):
                             if not ActionsExtractor.DATE_REGEX.fullmatch(event_time):
                                 continue
 
-                            row = {"event_time": event_time, "event_type": event_type}
+                            row = {
+                                "event_time": event_time,
+                                "event_type": event_type,
+                            }
 
                             if metadata and len(metadata) > 0:
-                                if event_type not in ActionsExtractor.NOT_JSON_METADATA:
+                                if (
+                                    event_type
+                                    not in ActionsExtractor.NOT_JSON_METADATA
+                                ):
                                     meta_json = json.loads(metadata)
-                                    if type(meta_json) == dict:
+                                    if isinstance(meta_json, dict):
                                         if "origin" in meta_json:
                                             row["event_op"] = meta_json["origin"]
                                         if "key" in meta_json:
@@ -102,14 +105,19 @@ class ActionsExtractor(Extractor):
                                 elif event_type == "submit":
                                     row["event_info"] = (
                                         "correct"
-                                        if metadata == ActionsExtractor.CORRECTED_INFO
+                                        if metadata
+                                        == ActionsExtractor.CORRECTED_INFO
                                         else "incorrect"
                                     )
 
                             rows.append({**base_row, **row})
-                        except:
-                            values = re.fullmatch(r"([^#]*)#([^#]*)#(.*)", l)
-                            print(values.groups())
-                            print("error on line {}".format(l))
+                        except Exception as ex:
+                            values = re.fullmatch(r"([^#]*)#([^#]*)#(.*)", ln)
+                            logger.critical(
+                                "error on line %s. groups %s",
+                                values.groups(),
+                                ln,
+                                exc_info=ex,
+                            )
                             exit(0)
         return rows

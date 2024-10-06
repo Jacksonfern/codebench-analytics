@@ -1,19 +1,18 @@
+import keyword
 import os
 import re
-
-import numpy as np
-import keyword
 import token
 import tokenize
-from typing import Dict, List
-from codebench_analytics.model.code_metrics import SolutionMetrics
-import codebench_analytics.model.token_mapping as tkm
-
 from collections import Counter, defaultdict
+from typing import Dict, List
 
+import numpy as np
 from radon.metrics import h_visit
 from radon.raw import analyze
 from radon.visitors import ComplexityVisitor
+
+import codebench_analytics.model.token_mapping as tkm
+from codebench_analytics.model.code_metrics import SolutionMetrics
 
 
 class Solution:
@@ -137,7 +136,9 @@ class Solution:
                 if match:
                     solution_id = int(match.groups()[0])
                 else:
-                    assert solution_id != -1, "not found id for solution {}".format(sol)
+                    assert solution_id != -1, "not found id for solution {}".format(
+                        sol
+                    )
                     tmp_code_src = "/tmp/code.py"
 
                     with open(tmp_code_src, "w+") as tmp_writer:
@@ -164,7 +165,7 @@ class Solution:
                 metrics["complexity"] = v.complexity
                 metrics["n_functions"] = len(v.functions)
                 metrics["n_classes"] = len(v.functions)
-            except BaseException as err:
+            except BaseException:
                 pass
 
             try:
@@ -176,7 +177,7 @@ class Solution:
                 metrics["comments"] = a.comments
                 metrics["single_comments"] = a.single_comments
                 metrics["multi_comments"] = a.multi
-            except BaseException as err:
+            except BaseException:
                 pass
 
             try:
@@ -193,7 +194,7 @@ class Solution:
                 metrics["effort"] = h.total.effort
                 metrics["bugs"] = h.total.bugs
                 metrics["time"] = h.total.time
-            except BaseException as err:
+            except BaseException:
                 pass
 
             try:
@@ -214,7 +215,9 @@ class Solution:
                             elif tk.type == token.NAME:
                                 if keyword.iskeyword(tk.string):
                                     token_count[
-                                        tkm.tk_codes.get(tk.string.lower(), tkm.KEYWORD)
+                                        tkm.tk_codes.get(
+                                            tk.string.lower(), tkm.KEYWORD
+                                        )
                                     ] += 1
                                 elif Solution.__is_builtin_type(tk.string):
                                     token_count[tkm.BUILTIN_TYPE] += 1
@@ -235,7 +238,7 @@ class Solution:
                                 unique_strings.add(tk.string)
                             else:
                                 token_count[tk.exact_type] += 1
-                    except BaseException as err:
+                    except BaseException:
                         pass
 
                 for k, v in Counter(token_count).items():
@@ -254,7 +257,7 @@ class Solution:
                     [len(x) for x in unique_identifiers]
                 )
 
-            except BaseException as err:
+            except BaseException:
                 pass
 
         return metrics

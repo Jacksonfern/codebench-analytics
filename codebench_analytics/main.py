@@ -1,16 +1,17 @@
-from codebench_analytics.model.codebench_types import Resource
-from codebench_analytics.model.code_metrics import SolutionMetrics
+from logging.config import fileConfig
+
 from collector.actions import ActionCollector
-from codebench_analytics.extractor.code_metrics_extractor import Solution
 from collector.executions import ExecutionCollector
+from extractor.execution_extractor import ExecutionExtractor
+
+from codebench_analytics.extractor.action_extractor import ActionsExtractor
+from codebench_analytics.extractor.code_metrics_extractor import Solution
+from codebench_analytics.model.code_metrics import SolutionMetrics
+from codebench_analytics.model.codebench_types import Resource
 from codebench_analytics.utils.assessments_filter import (
-    AssessmentFilter,
     AssessmentType,
 )
-from codebench_analytics.extractor.action_extractor import ActionsExtractor
-from extractor.execution_extractor import ExecutionExtractor
 from codebench_analytics.utils.dataset import save
-from logging.config import fileConfig
 
 fileConfig("codebench_analytics/logging/logging.ini")
 
@@ -40,7 +41,12 @@ def generate_code_metrics():
     src = "/home/jackson/Downloads/codigo_solucao.csv"
     res = Solution.extract_from_professor(src)
     csv_fields = list(vars(SolutionMetrics()).keys())
-    save("output/data", "code_metrics_professor.csv", res, ["question_id", *csv_fields])
+    save(
+        "output/data",
+        "code_metrics_professor.csv",
+        res,
+        ["question_id", *csv_fields],
+    )
 
 
 if __name__ == "__main__":

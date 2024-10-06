@@ -1,11 +1,10 @@
-from typing import Dict, List, Tuple
 import csv
-from codebench_analytics.model.metrics import QuestionMetrics, StudentQuestionInfo
-from codebench_analytics.collector import Collector
-
-from codebench_analytics.utils.dataset import save
-
 import logging
+from typing import Dict, List, Tuple
+
+from codebench_analytics.collector import Collector
+from codebench_analytics.model.metrics import QuestionMetrics, StudentQuestionInfo
+from codebench_analytics.utils.dataset import save
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ class ExecutionCollector(Collector):
                     row_student = int(row["student"])
                     key = (row_student, row_question)
 
-                    if not key in students_info:
+                    if key not in students_info:
                         students_info[key] = StudentQuestionInfo()
 
                     question = students_info[key]
@@ -68,7 +67,7 @@ class ExecutionCollector(Collector):
         questions_statistics: Dict[int, QuestionMetrics] = {}
         for key, info in students_info.items():
             _, question = key
-            if not question in questions_statistics:
+            if question not in questions_statistics:
                 questions_statistics[question] = QuestionMetrics()
             qs = questions_statistics[question]
 
@@ -89,7 +88,7 @@ class ExecutionCollector(Collector):
 
             assert (
                 qs.num_errors >= qs.num_logic_errors
-            ), "the number of logic errors is bigger than the number of all possible errors"
+            ), "number of logic errors bigger than number of all possible errors"
 
         to_erase = filter(
             lambda id: questions_statistics[id].num_students_interactions == 0,

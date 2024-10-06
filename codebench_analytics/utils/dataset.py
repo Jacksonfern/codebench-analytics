@@ -1,7 +1,7 @@
 import csv
 import logging
-from os import path, makedirs
-from typing import Dict, Any, List, Union
+from os import makedirs, path
+from typing import Any, Dict, List, Union
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +34,9 @@ def save(
     logging.info("generating '%s' file into '%s'", filename, src)
 
     with open(src, "w+") as csvfile:
-        if type(data) == dict:
+        if isinstance(data, dict):
             save_dict(csvfile, data, fields)
-        elif type(data) == list:
+        elif isinstance(data, list):
             save_list(csvfile, data, fields)
         else:
             raise ValueError("invalid data type {}".format(type(data)))

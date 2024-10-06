@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from codebench_analytics.utils.assessments_filter import AssessmentType
 from codebench_analytics.model.codebench_types import Resource
+from codebench_analytics.utils.assessments_filter import AssessmentType
 
 
 class Extractor(ABC):

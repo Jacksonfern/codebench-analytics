@@ -1,17 +1,17 @@
 import logging
+import re
 from os import path
 from typing import List, Optional
 
 from codebench_analytics.extractor import Extractor
 from codebench_analytics.model.codebench_types import QuestionExecution, Resource
-from codebench_analytics.utils.components import Components
 from codebench_analytics.utils.assessments_filter import (
     AssessmentFilter,
     AssessmentType,
 )
-from codebench_analytics.utils.dataset import save
 from codebench_analytics.utils.code_diff import code_diff
-import re
+from codebench_analytics.utils.components import Components
+from codebench_analytics.utils.dataset import save
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,9 @@ class ExecutionExtractor(Extractor):
         ]
         return save("output/data", "executions_data.csv", data, csv_fields)
 
-    def _collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]]) -> list:
+    def _collect(
+        self, dataset_src: str, kinds: Optional[list[AssessmentType]]
+    ) -> list:
         execs = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
@@ -57,7 +59,7 @@ class ExecutionExtractor(Extractor):
                 assessment_id, question_id = name.split("_", 1)
                 assessment_id, question_id = int(assessment_id), int(question_id)
 
-                if not assessment_id in assessments_filtered:
+                if assessment_id not in assessments_filtered:
                     continue
 
                 base_row = {
@@ -77,51 +79,53 @@ class ExecutionExtractor(Extractor):
                     cur_code, prev_code = [], []
 
                     while i < len(lines):
-                        l = lines[i].strip()
-                        if l.startswith("== SUBMITION"):
+                        ln = lines[i].strip()
+                        if ln.startswith("== SUBMITION"):
                             row["execution_type"] = "submission"
                             op = QuestionExecution.SUBMIT
-                        elif l.startswith("== TEST"):
+                        elif ln.startswith("== TEST"):
                             row["execution_type"] = "test"
                             op = QuestionExecution.TEST
-                        elif l.startswith("-- ERROR:"):
+                        elif ln.startswith("-- ERROR:"):
                             assert (
                                 op != QuestionExecution.NONE
                             ), "no submission or test for execution error"
                             row["run"] = "error"
                             while i < len(lines):
-                                l = lines[i].strip()
-                                error_type = re.fullmatch(r"(.*)Error:.*", l)
+                                error_line = lines[i].strip()
+                                error_type = re.fullmatch(
+                                    r"(.*)Error:.*", error_line
+                                )
                                 if error_type:
                                     row["run_error_type"] = error_type.groups()[
                                         0
                                     ].lower()
                                     op = QuestionExecution.NONE
                                     break
-                                elif (
-                                    l
-                                    == "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
-                                ):
+                                elif error_line == self.TERMINATOR:
                                     row["run_error_type"] = "unknown"
                                     break
                                 i += 1
-                        elif l.startswith("-- GRADE:"):
+                        elif ln.startswith("-- GRADE:"):
                             i += 1
                             grade = lines[i].strip()
 
                             assert (
                                 op == QuestionExecution.SUBMIT
-                            ), f"Response for non submission in {fullpath} {lines[i]}"
+                            ), f"Response for non submission in {fullpath}"
                             assert re.match(r"\d+\%", grade), "Not a percent number"
 
                             row["run"] = "successful"
                             row["grade"] = grade[:-1]
-                        elif l.startswith("-- CODE:"):
+                        elif ln.startswith("-- CODE:"):
                             while i + 1 < len(lines):
-                                l = lines[i + 1].strip()
-                                if l.startswith("--") or l == self.TERMINATOR:
+                                next_line = lines[i + 1].strip()
+                                if (
+                                    next_line.startswith("--")
+                                    or next_line == self.TERMINATOR
+                                ):
                                     break
-                                cur_code.append(l)
+                                cur_code.append(next_line)
                                 i += 1
                             assert (
                                 len(cur_code) > 0
@@ -130,13 +134,15 @@ class ExecutionExtractor(Extractor):
                             )
 
                             if len(prev_code) > 0:
-                                row["amount_of_change"] = code_diff(prev_code, cur_code)
+                                row["amount_of_change"] = code_diff(
+                                    prev_code, cur_code
+                                )
                             prev_code = cur_code
                             cur_code = []
-                        elif l.startswith("-- OUTPUT:"):
+                        elif ln.startswith("-- OUTPUT:"):
                             row["run"] = "successful"
 
-                        if l == self.TERMINATOR:
+                        if ln == self.TERMINATOR:
                             log_rows.append({**base_row, **row})
                             row = {}
                         i += 1

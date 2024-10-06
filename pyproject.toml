@@ -8,9 +8,12 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 radon = "^6.0.1"
-black = "^24.8.0"
 numpy = "^2.1.1"
 pandas = "^2.2.3"
+
+[tool.poetry.group.lint.dependencies]
+black = "^24.8.0"
+ruff = "^0.6.9"
 
 [tool.poetry.scripts]
 codebench_analytics = 'codebench_analytics.main:main'
@@ -18,3 +21,28 @@ codebench_analytics = 'codebench_analytics.main:main'
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 85
+indent-width = 4
+show-fixes = true
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+extend-select = [
+  "E501",
+  "W291",
+  "W292",
+  "W293",
+  "W505",
+  "I001",
+  "N801",
+  "N802",
+  "N803"
+]
+
+[tool.black]
+line-length = 85
+target-version = ["py311"]

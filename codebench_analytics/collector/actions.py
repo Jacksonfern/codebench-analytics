@@ -1,11 +1,11 @@
-from typing import Dict, List, Tuple, Optional
-
 import csv
-from codebench_analytics.model.metrics import CodeMetrics, StudentCodeInfo
-from codebench_analytics.collector import Collector
-from codebench_analytics.utils.dataset import save
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
+
+from codebench_analytics.collector import Collector
+from codebench_analytics.model.metrics import CodeMetrics, StudentCodeInfo
+from codebench_analytics.utils.dataset import save
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class ActionCollector(Collector):
                 row_event_type = row["event_type"]
                 row_time = row["event_time"]
 
-                if not key in data:
+                if key not in data:
                     data[key] = StudentCodeInfo()
                 question_log = data[key]
                 cur_time = datetime.strptime(row_time, "%Y-%m-%d %H:%M:%S.%f")
@@ -76,12 +76,18 @@ class ActionCollector(Collector):
         metrics_info: Optional[CodeMetrics] = None
         for key, value in data.items():
             student, question_id = key
-            if not value.submitted and value.code_time >= ActionCollector.MIN_IT_TIME:
+            if (
+                not value.submitted
+                and value.code_time >= ActionCollector.MIN_IT_TIME
+            ):
                 assert metrics_info is not None
                 metrics_info.num_blank += 1
-            if value.code_time > ActionCollector.MAX_CODE_TIME or not value.submitted:
+            if (
+                value.code_time > ActionCollector.MAX_CODE_TIME
+                or not value.submitted
+            ):
                 continue
-            if not question_id in questions_info:
+            if question_id not in questions_info:
                 questions_info[question_id] = CodeMetrics()
             metrics_info = questions_info[question_id]
 
