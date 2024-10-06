@@ -11,7 +11,8 @@ def save_dict(csvfile, data: Dict[int, Any], fields):
 
     writer.writeheader()
     for key, value in data.items():
-        writer.writerow({fields[0]: key, **vars(value)})
+        rows = {field: getattr(value, field) for field in fields[1:]}
+        writer.writerow({fields[0]: key, **rows})
 
 
 def save_list(csvfile, data: List[Any], fields):

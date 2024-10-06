@@ -60,7 +60,7 @@ class ActionCollector(Collector):
                         question_log.is_correct = True
 
         store_data: List[dict] = []
-        csv_fields = ["student", "question", *vars(StudentCodeInfo()).keys()]
+        csv_fields = ["student", "question", *StudentCodeInfo().to_dict.keys()]
         for key, metrics_info in data.items():
             if (
                 metrics_info.submitted
@@ -68,12 +68,16 @@ class ActionCollector(Collector):
             ):
                 student, question = key
                 store_data.append(
-                    {"student": student, "question": question, **vars(metrics_info)}
+                    {
+                        "student": student,
+                        "question": question,
+                        **metrics_info.to_dict,
+                    }
                 )
         save("output/metrics", "actions_by_student.csv", store_data, csv_fields)
 
         questions_info: Dict[int, CodeMetrics] = {}
-        metrics_info: Optional[CodeMetrics] = None
+        metrics_info: Optional[CodeMetrics] = CodeMetrics()
         for key, value in data.items():
             student, question_id = key
             if (
@@ -96,7 +100,7 @@ class ActionCollector(Collector):
             metrics_info.num_events += value.num_events
             metrics_info.num_deletes += value.num_deletes
 
-        csv_fields = list(vars(CodeMetrics()).keys())
+        csv_fields = list(CodeMetrics().to_dict.keys())
         return save(
             "output/metrics",
             "actions_data.csv",

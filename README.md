@@ -43,6 +43,8 @@ Já o parâmetro `-k` (ou `--kind`) especifica os tipos de atividades que devem 
 poetry run codebench_analytics (execution|action) -p codebench/dataset/2021-1 -p codebench/dataset/2022-2 -k exam
 ```
 
+Após o término da execução, você verá uma pasta chamada `output` na raiz do projeto.
+
 ### Extraindo métricas de código da solução
 
 Para rodar o projeto apenas para extração de métricas de código, rode o seguinte comando:

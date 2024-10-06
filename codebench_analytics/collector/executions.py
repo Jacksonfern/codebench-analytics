@@ -55,12 +55,12 @@ class ExecutionCollector(Collector):
                 print("error processing csv file on line {}".format(reader.line_num))
 
         store_data: List[dict] = []
-        csv_fields = ["student", "question", *vars(StudentQuestionInfo()).keys()]
+        csv_fields = ["student", "question", *StudentQuestionInfo().to_dict.keys()]
         for key, info in students_info.items():
             if info.num_submissions > 0:
                 student, question = key
                 store_data.append(
-                    {"student": student, "question": question, **vars(info)}
+                    {"student": student, "question": question, **info.to_dict}
                 )
         save("output/metrics", "executions_by_student.csv", store_data, csv_fields)
 
@@ -94,10 +94,10 @@ class ExecutionCollector(Collector):
             lambda id: questions_statistics[id].num_students_interactions == 0,
             questions_statistics,
         )
-        for id in to_erase:
+        for id in list(to_erase):
             questions_statistics.pop(id)
 
-        csv_fields = list(vars(QuestionMetrics()).keys())
+        csv_fields = list(QuestionMetrics().to_dict.keys())
         save(
             "output/metrics",
             "executions.csv",

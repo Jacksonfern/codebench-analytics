@@ -1,7 +1,9 @@
-from enum import Enum
+import logging
 from os import listdir, path
 
 from codebench_analytics.model.codebench_types import Data, Resource
+
+logger = logging.getLogger(__name__)
 
 
 class Components:
@@ -10,15 +12,20 @@ class Components:
     """
 
     @staticmethod
-    def get_data(dataset_src: str, resource_path: Enum) -> list:
+    def get_data(dataset_src: str, resource: Resource) -> list:
         classes = listdir(dataset_src)
         data = []
 
         for _class in classes:
-            src = path.join(dataset_src, _class, resource_path.value)
+            src = path.join(dataset_src, _class, resource.value)
             rlsrc = path.relpath(src, dataset_src)
-            for element in listdir(src):
-                data.append(path.join(rlsrc, element))
+            try:
+                for element in listdir(src):
+                    data.append(path.join(rlsrc, element))
+            except FileNotFoundError:
+                logger.error(
+                    "resource '%s' not found in path '%s'", resource.value, src
+                )
 
         return data
 

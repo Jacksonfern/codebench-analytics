@@ -1,18 +1,8 @@
-from abc import ABC, abstractmethod
-from enum import Enum
+from dataclasses import dataclass
 from typing import Optional
 
 
-class Metric(ABC):
-    def __init__(self, *dataset_src, resource: Enum):
-        self.dataset_src = dataset_src
-        self.resource = resource
-
-    @abstractmethod
-    def collect(self, kinds: Optional[list[str]] = None) -> str:
-        pass
-
-
+@dataclass(slots=True)
 class QuestionMetrics:
     """Retrieves students executions and store metrics related to questions.
 
@@ -22,26 +12,27 @@ class QuestionMetrics:
     after that will not be considered
     """
 
-    def __init__(
-        self,
-        num_students_interactions=0,
-        num_submissions=0,
-        num_tests=0,
-        num_correct=0,
-        num_errors=0,
-        num_logic_errors=0,
-        num_syntax_errors=0,
-        amount_of_change=0,
-    ):
-        self.num_students_interactions = num_students_interactions
-        self.num_submissions = num_submissions
-        self.num_tests = num_tests
+    num_students_interactions: int = 0
+    num_submissions: int = 0
+    num_tests: int = 0
+    num_correct: int = 0
+    num_errors: int = 0
+    num_logic_errors: int = 0
+    num_syntax_errors: int = 0
+    amount_of_change: int = 0
 
-        self.num_correct = num_correct
-        self.num_errors = num_errors
-        self.num_logic_errors = num_logic_errors
-        self.num_syntax_errors = num_syntax_errors
-        self.amount_of_change = amount_of_change
+    @property
+    def to_dict(self):
+        return {
+            "num_students_interactions": self.num_students_interactions,
+            "num_submissions": self.num_submissions,
+            "num_tests": self.num_tests,
+            "num_correct": self.num_correct,
+            "num_errors": self.num_errors,
+            "num_logic_errors": self.num_logic_errors,
+            "num_syntax_errors": self.num_syntax_errors,
+            "amount_of_change": self.amount_of_change,
+        }
 
     def __add__(self, other):
         return QuestionMetrics(
@@ -56,61 +47,68 @@ class QuestionMetrics:
         )
 
 
+@dataclass(slots=True)
 class StudentQuestionInfo:
     """Contains statistics about student solving a question."""
 
-    def __init__(
-        self,
-        is_correct=False,
-        num_submissions=0,
-        num_tests=0,
-        num_errors=0,
-        num_logic_errors=0,
-        num_syntax_errors=0,
-        amount_of_change=0,
-    ):
-        self.is_correct = is_correct
-        self.num_submissions = num_submissions
-        self.num_tests = num_tests
-        self.num_errors = num_errors
-        self.num_logic_errors = num_logic_errors
-        self.num_syntax_errors = num_syntax_errors
-        self.amount_of_change = amount_of_change
+    is_correct: bool = False
+    num_submissions: int = 0
+    num_tests: int = 0
+    num_errors: int = 0
+    num_logic_errors: int = 0
+    num_syntax_errors: int = 0
+    amount_of_change: int = 0
+
+    @property
+    def to_dict(self):
+        return {
+            "is_correct": self.is_correct,
+            "num_submissions": self.num_submissions,
+            "num_tests": self.num_tests,
+            "num_errors": self.num_errors,
+            "num_logic_errors": self.num_logic_errors,
+            "num_syntax_errors": self.num_syntax_errors,
+            "amount_of_change": self.amount_of_change,
+        }
 
 
+@dataclass(slots=True)
 class StudentCodeInfo:
     """Statistics about a code submitted by a student."""
 
-    def __init__(
-        self,
-        is_correct=False,
-        submitted=False,
-        code_time=0,
-        num_events=0,
-        num_deletes=0,
-        last_time=None,
-    ):
-        self.is_correct = is_correct
-        self.submitted = submitted
-        self.code_time = code_time
-        self.num_events = num_events
-        self.num_deletes = num_deletes
-        self.last_time = last_time
+    is_correct: bool = False
+    submitted: bool = False
+    code_time: int = 0
+    num_events: int = 0
+    num_deletes: int = 0
+    last_time: Optional[int] = None
+
+    @property
+    def to_dict(self):
+        return {
+            "is_correct": self.is_correct,
+            "submitted": self.submitted,
+            "code_time": self.code_time,
+            "num_events": self.num_events,
+            "num_deletes": self.num_deletes,
+            "last_time": self.last_time,
+        }
 
 
+@dataclass(slots=True)
 class CodeMetrics:
     """General statistics about a question."""
 
-    def __init__(self, code_time=0, num_events=0, num_deletes=0, num_blank=0):
-        self.code_time = code_time
-        self.num_events = num_events
-        self.num_deletes = num_deletes
-        self.num_blank = num_blank
+    code_time: int = 0
+    num_events: int = 0
+    num_deletes: int = 0
+    num_blank: int = 0
 
-
-class ActionInfo:
-    def __init__(self, date, event_type, event_key=None, event_op=None):
-        self.date = date
-        self.event_type = event_type
-        self.event_key = event_key
-        self.event_op = event_op
+    @property
+    def to_dict(self):
+        return {
+            "code_time": self.code_time,
+            "num_events": self.num_events,
+            "num_deletes": self.num_deletes,
+            "num_blank": self.num_blank,
+        }

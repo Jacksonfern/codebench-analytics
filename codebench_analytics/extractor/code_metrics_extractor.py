@@ -1,3 +1,5 @@
+# Adapted from: https://github.com/marcosmapl/codebench-mining-tool/
+
 import keyword
 import os
 import re
@@ -123,7 +125,7 @@ class Solution:
 
     @staticmethod
     def extract_from_professor(csv_src: str):
-        data: Dict[SolutionMetrics] = {}
+        data: Dict[int, SolutionMetrics] = {}
         with open(csv_src, "r") as csv_file:
             text = "".join(csv_file.readlines())
             solutions = re.split(r"#?\$#\$#\n|#!#!#", text)
