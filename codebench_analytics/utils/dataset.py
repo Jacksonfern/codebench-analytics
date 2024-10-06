@@ -3,6 +3,8 @@ import logging
 from os import path, makedirs
 from typing import Dict, Any, List, Union
 
+logger = logging.getLogger(__name__)
+
 
 def save_dict(csvfile, data: Dict[int, Any], fields):
     writer = csv.DictWriter(csvfile, fieldnames=fields)
@@ -29,7 +31,7 @@ def save(
         filename += ".csv"
 
     src = path.join(base_src, filename)
-    logging.info("Generating {} file into {}...".format(filename, src))
+    logging.info("generating '%s' file into '%s'", filename, src)
 
     with open(src, "w+") as csvfile:
         if type(data) == dict:
@@ -37,8 +39,6 @@ def save(
         elif type(data) == list:
             save_list(csvfile, data, fields)
         else:
-            raise ValueError("Invalid data type {}".format(type(data)))
-
-    logging.info("Done!")
+            raise ValueError("invalid data type {}".format(type(data)))
 
     return src

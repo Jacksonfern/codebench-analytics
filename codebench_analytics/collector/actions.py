@@ -5,6 +5,9 @@ from codebench_analytics.model.metrics import CodeMetrics, StudentCodeInfo
 from codebench_analytics.collector import Collector
 from codebench_analytics.utils.dataset import save
 from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ActionCollector(Collector):
@@ -17,6 +20,7 @@ class ActionCollector(Collector):
         data: Dict[Tuple[int, int], StudentCodeInfo] = {}
 
         with open(self.csv_source, "r", newline="") as csv_file:
+            logger.info("collecting student actions from '%s'", self.csv_source)
             reader = csv.DictReader(csv_file)
 
             for row in reader:
@@ -94,6 +98,7 @@ class ActionCollector(Collector):
             ["question", *csv_fields],
         )
 
-if __name__ == '__main__':
-    src = 'output/data/actions.csv'
+
+if __name__ == "__main__":
+    src = "output/data/actions.csv"
     ActionCollector(src).collect()

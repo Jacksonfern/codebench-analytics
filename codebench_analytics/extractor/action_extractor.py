@@ -1,4 +1,3 @@
-from enum import Enum
 import json
 
 import re
@@ -6,17 +5,22 @@ from typing import Optional
 
 from codebench_analytics.extractor import Extractor
 from codebench_analytics.utils.components import Components
-from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
-from codebench_analytics.model.metrics import Metric
+from codebench_analytics.utils.assessments_filter import (
+    AssessmentFilter,
+    AssessmentType,
+)
 from os import path
+import logging
 
 from codebench_analytics.utils.dataset import save
+
+logger = logging.getLogger(__name__)
 
 
 class ActionsExtractor(Extractor):
 
-    correctedInfo = "Congratulations, your code is correct!"
-    not_json_metadata = [
+    CORRECTED_INFO = "Congratulations, your code is correct!"
+    NOT_JSON_METADATA = [
         "submit",
         "kill_program",
         "rename_file",
@@ -24,12 +28,12 @@ class ActionsExtractor(Extractor):
         "dica_bullet",
         "dica_open",
     ]
-    date_regex = re.compile(r"\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}\.\d{3}")
+    DATE_REGEX = re.compile(r"\d{4}-\d{1,2}-\d{1,2}\s\d{2}:\d{2}:\d{2}\.\d{3}")
 
-    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
+    def extract_from(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         data = []
         for src in self.dataset_src:
-            print("Collecting {} from {}".format(self.resource.value, src))
+            logger.info("extracting '%s' from '%s'", self.resource.value, src)
             partial_data = self.__collect(src, kinds)
             data.extend(partial_data)
 
@@ -46,7 +50,9 @@ class ActionsExtractor(Extractor):
         ]
         return save("output/data", "actions.csv", data, csv_fields)
 
-    def __collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]] = None) -> list:
+    def __collect(
+        self, dataset_src: str, kinds: Optional[list[AssessmentType]] = None
+    ) -> list:
         user_events = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
@@ -80,13 +86,13 @@ class ActionsExtractor(Extractor):
                                 continue
 
                             event_time, event_type, metadata = values.groups()
-                            if not ActionsExtractor.date_regex.fullmatch(event_time):
+                            if not ActionsExtractor.DATE_REGEX.fullmatch(event_time):
                                 continue
 
                             row = {"event_time": event_time, "event_type": event_type}
 
                             if metadata and len(metadata) > 0:
-                                if event_type not in ActionsExtractor.not_json_metadata:
+                                if event_type not in ActionsExtractor.NOT_JSON_METADATA:
                                     meta_json = json.loads(metadata)
                                     if type(meta_json) == dict:
                                         if "origin" in meta_json:
@@ -96,7 +102,7 @@ class ActionsExtractor(Extractor):
                                 elif event_type == "submit":
                                     row["event_info"] = (
                                         "correct"
-                                        if metadata == ActionsExtractor.correctedInfo
+                                        if metadata == ActionsExtractor.CORRECTED_INFO
                                         else "incorrect"
                                     )
 

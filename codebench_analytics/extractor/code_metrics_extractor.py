@@ -17,6 +17,7 @@ from radon.visitors import ComplexityVisitor
 
 
 class Solution:
+    """Extract metrics from codebench solutions logs."""
 
     __type_list = [
         "bool",

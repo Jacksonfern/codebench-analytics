@@ -5,21 +5,21 @@ from codebench_analytics.collector import Collector
 
 from codebench_analytics.utils.dataset import save
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class ExecutionCollector(Collector):
     """
     This class extracts metrics related to students code submissions
     on codebench and generate statistics for each question.
-    The basic metrics extracted here is:
-
-    Attributes
-    ----------
-    TODO:
     """
 
     def collect(self):
         students_info: Dict[Tuple[int, int], StudentQuestionInfo] = {}
         with open(self.csv_source, "r", newline="") as csv_file:
+            logger.info("collecting metrics from '%s'", self.csv_source)
             reader = csv.DictReader(csv_file)
             try:
                 for row in reader:

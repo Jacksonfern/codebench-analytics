@@ -269,7 +269,3 @@ class SolutionMetrics:
             self.identifiers_min_len,
             self.identifiers_mean_len,
         ]
-
-    @staticmethod
-    def get_lista_atributos():
-        return list(vars(SolutionMetrics(None, None, None, None, None).keys()))

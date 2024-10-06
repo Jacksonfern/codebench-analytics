@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from codebench_analytics.assessments_filter import AssessmentType
+from codebench_analytics.utils.assessments_filter import AssessmentType
 from codebench_analytics.model.codebench_types import Resource
 
 
@@ -13,5 +13,5 @@ class Extractor(ABC):
         self.resource = resource
 
     @abstractmethod
-    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
+    def extract_from(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         pass

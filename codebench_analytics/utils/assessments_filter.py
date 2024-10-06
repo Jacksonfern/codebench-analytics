@@ -3,6 +3,7 @@ from os import path
 
 from codebench_analytics.model.codebench_types import Data
 from codebench_analytics.utils.components import Components
+import logging
 
 
 class AssessmentType(StrEnum):

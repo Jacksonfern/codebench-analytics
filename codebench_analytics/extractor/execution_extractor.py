@@ -1,13 +1,19 @@
+import logging
 from os import path
 from typing import List, Optional
 
 from codebench_analytics.extractor import Extractor
 from codebench_analytics.model.codebench_types import QuestionExecution, Resource
 from codebench_analytics.utils.components import Components
-from codebench_analytics.assessments_filter import AssessmentFilter, AssessmentType
+from codebench_analytics.utils.assessments_filter import (
+    AssessmentFilter,
+    AssessmentType,
+)
 from codebench_analytics.utils.dataset import save
 from codebench_analytics.utils.code_diff import code_diff
 import re
+
+logger = logging.getLogger(__name__)
 
 
 class ExecutionExtractor(Extractor):
@@ -15,12 +21,10 @@ class ExecutionExtractor(Extractor):
 
     TERMINATOR = "*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 
-    def __init__(self, *dataset_src, resource: Resource):
-        super().__init__(*dataset_src, resource=resource)
-
-    def collect(self, kinds: Optional[list[AssessmentType]] = None) -> str:
+    def extract_from(self, kinds: Optional[list[AssessmentType]] = None) -> str:
         data: List[dict] = []
         for src in self.dataset_src:
+            logger.info("extracting execution data from '%s'", src)
             partial_data = self._collect(src, kinds)
             data.extend(partial_data)
 
@@ -41,7 +45,6 @@ class ExecutionExtractor(Extractor):
         return save("output/data", "executions_data.csv", data, csv_fields)
 
     def _collect(self, dataset_src: str, kinds: Optional[list[AssessmentType]]) -> list:
-        print("Collecting {} from {}".format(self.resource.value, dataset_src))
         execs = Components.get_users_data(dataset_src, self.resource)
         assessments_filtered = AssessmentFilter.get(dataset_src, kinds)
         year = path.basename(dataset_src)
@@ -139,11 +142,8 @@ class ExecutionExtractor(Extractor):
                         i += 1
         return log_rows
 
-    def _log_from_rows(self):
-        pass
 
-    def _row_from(self):
-        pass
-
-if __name__ == '__main__':
-    ExecutionExtractor('/home/jackson/Downloads/2023-1', resource=Resource.EXECUTIONS).collect([AssessmentType.EXAM])
+if __name__ == "__main__":
+    ExecutionExtractor(
+        "/home/jackson/Downloads/2023-1", resource=Resource.EXECUTIONS
+    ).extract_from([AssessmentType.EXAM])
