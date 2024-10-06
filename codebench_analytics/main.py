@@ -1,11 +1,13 @@
 from logging.config import fileConfig
+from typing import Optional
 
-from collector.actions import ActionCollector
-from collector.executions import ExecutionCollector
-from extractor.execution_extractor import ExecutionExtractor
+import click
 
+from codebench_analytics.collector.actions import ActionCollector
+from codebench_analytics.collector.executions import ExecutionCollector
 from codebench_analytics.extractor.action_extractor import ActionsExtractor
 from codebench_analytics.extractor.code_metrics_extractor import Solution
+from codebench_analytics.extractor.execution_extractor import ExecutionExtractor
 from codebench_analytics.model.code_metrics import SolutionMetrics
 from codebench_analytics.model.codebench_types import Resource
 from codebench_analytics.utils.assessments_filter import (
@@ -16,30 +18,53 @@ from codebench_analytics.utils.dataset import save
 fileConfig("codebench_analytics/logging/logging.ini")
 
 
-def main():
-    srcs = ("/home/jackson/Downloads/2023-1",)
-    kinds = [AssessmentType.EXAM]
+@click.group()
+def cli():
+    pass
 
+
+@click.command()
+@click.option(
+    "-p",
+    "--path",
+    multiple=True,
+    required=True,
+    type=str,
+    help="path to codebench dataset. It can be set multiple times",
+)
+@click.option("-k", "--kind", multiple=True, required=False, type=AssessmentType)
+def execution(path: tuple[str], kind: Optional[tuple[AssessmentType]]):
     # transform codebench execution logs into csv datasets
-    path = ExecutionExtractor(*srcs, resource=Resource.EXECUTIONS).extract_from(
-        kinds=kinds
+    path = ExecutionExtractor(*path, resource=Resource.EXECUTIONS).extract_from(
+        kinds=kind or None
     )
-
     # collect execution metrics from students
     ExecutionCollector(path).collect()
 
-    # transform codebench student actions logs into csv datasets
-    path = ActionsExtractor(*srcs, resource=Resource.CODEMIRRORS).extract_from(
-        kinds=kinds
-    )
 
+@click.command()
+@click.option(
+    "-p",
+    "--path",
+    multiple=True,
+    required=True,
+    type=str,
+    help="path to codebench dataset. It can be set multiple times",
+)
+@click.option("-k", "--kind", multiple=True, required=False, type=AssessmentType)
+def action(path: tuple[str], kind: Optional[tuple[AssessmentType]]):
+    # transform codebench student actions logs into csv datasets
+    path = ActionsExtractor(*path, resource=Resource.CODEMIRRORS).extract_from(
+        kinds=kind or None
+    )
     # collect action metrics from students
     ActionCollector(path).collect()
 
 
-def generate_code_metrics():
-    src = "/home/jackson/Downloads/codigo_solucao.csv"
-    res = Solution.extract_from_professor(src)
+@click.command()
+@click.option("-p", "--path", required=True, type=str, help="file with solutions")
+def solution(path: str):
+    res = Solution.extract_from_professor(path)
     csv_fields = list(vars(SolutionMetrics()).keys())
     save(
         "output/data",
@@ -47,6 +72,14 @@ def generate_code_metrics():
         res,
         ["question_id", *csv_fields],
     )
+
+
+def main():
+    cli.add_command(execution)
+    cli.add_command(action)
+    cli.add_command(solution)
+
+    cli()
 
 
 if __name__ == "__main__":

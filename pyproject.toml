@@ -10,6 +10,7 @@ python = "^3.11"
 radon = "^6.0.1"
 numpy = "^2.1.1"
 pandas = "^2.2.3"
+click = "^8.1.7"
 
 [tool.poetry.group.lint.dependencies]
 black = "^24.8.0"
